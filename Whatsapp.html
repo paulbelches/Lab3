@@ -1,0 +1,277 @@
+<html>
+    <body>
+        <script>
+            let lastId = 0
+            let mem = []
+
+            const messagesContainer = document.createElement("div")
+            const nameContainer = document.createElement("div")
+            const contactContainer = document.createElement("div")
+            const messages = document.createElement("ul");
+            const sendContainer = document.createElement("div")
+            const groupName = document.createElement("p")
+            const members = document.createElement("p")
+
+            groupName.append("cursed_CS-PROMO")
+            members.append("Paul,")
+
+            const textarea = document.createElement("textarea")
+            textarea.maxLength = "140"
+            textarea.placeholder = "Escribe un mensaje aquí"
+            textarea.style = `
+                resize: none;
+                font-family: Helvetica;
+                border: 0px solid #b7bbbd;
+                border-radius: 25px;
+                padding: 7px;
+                padding-left: 15px;
+                padding-top: 10px;
+                width: 95%;
+                outline: none;
+            `
+            groupName.style = `
+                font-family: Helvetica;
+                margin-left: 10px;
+                margin-bottom: 2px;
+                font-size: 1em;
+            `
+            members.style = `
+                font-family: Helvetica;
+                color: #787878;
+                margin-left: 10px;
+                margin-top: -3px;
+                font-size: .7em;
+                line-height: 3em;
+            `
+
+            const img = document.createElement("img")
+            img.src = "happyFace.png";
+            img.style = `
+                margin-left: -5px;
+                width:40px;
+                heigth:50px;
+            `
+
+            const button = document.createElement("img")
+            button.src = "arrow.png";
+            button.style = `
+                width:40px;
+                heigth:60px;
+                margin-top: 5px;
+            `
+
+            const contactImg = document.createElement("img")
+            contactImg.src = "groupImage.png";
+            contactImg.style = `
+                width:75px;
+                heigth:70px;
+                margin-top: 5px;
+            `
+            const contactEndImg = document.createElement("img")
+            contactEndImg.src = "contactBarEnd.png";
+
+            messages.style= `
+                font-family: Helvetica;
+                list-style: none;
+            `
+
+            nameContainer.append(groupName)
+            nameContainer.append(members)
+
+            contactContainer.append(contactImg)
+            contactContainer.append(nameContainer)
+            contactContainer.append(contactEndImg)
+            
+            document.body.append(contactContainer)
+            messagesContainer.append(messages)
+            document.body.append(messagesContainer)
+            sendContainer.append(img)
+            sendContainer.append(textarea)
+            sendContainer.append(button)
+
+
+
+            document.body.style= `
+                background: linear-gradient(180deg, #009688 20%, #dadbd3 0% );
+            `
+            contactContainer.style = `
+                background-color: #efefef;
+                width: 80%; 
+                height: 10%;
+                margin-left:10%;               
+                display: flex;
+            `
+
+            messagesContainer.style = `
+                background-image: url("TnNwdvV.png");
+                width: 80%; 
+                height: 80%;
+                margin-left:10%;
+                overflow-y: scroll;
+                overflow-x: hidden;
+            `
+            sendContainer.style = `
+                width: 79%; 
+                padding: 10px;
+                background-color: #efefef;
+                display: flex;
+                margin-left:10%;
+                height: 5%;
+            `
+
+            nameContainer.style = `
+                display: flex;
+                flex-direction:column;
+                background-color: #efefef;
+                width: 79%;
+            `
+            contactEndImg.style = `
+                margin-left: -5px;
+                heigth:10px;
+            `
+            document.body.append(sendContainer)
+
+            function checkForWebSite(page){
+               return (/.com/.test(page) ||
+                /.org/.test(page) ||
+                /.net/.test(page) ||
+                /.site/.test(page) ||
+                /.edu/.test(page) ) &&
+                (/www/.test(page) ||
+                /http/.test(page))
+            }
+
+            function checkForImg(page){
+                return ((/.jpge/.test(page) ||
+                /.jpg/.test(page) ||
+                /.gif/.test(page) ||
+                /.apng/.test(page) ||
+                /.svg/.test(page) ||
+                /.bmp/.test(page) ) &&
+                (/www/.test(page) ||
+                /http/.test(page)))
+            }
+            function getRandomColor() {
+                var letters = '0123456789ABCDEF';
+                var color = '#';
+                for (var i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
+            function getMessages(){
+                let id = 0 
+                fetch('http://msdeus.site:7000', {
+                    method: 'GET'
+                }).then(response => {
+                    return response.json()
+                }).then(response => {
+                    response.forEach(element => {
+                        
+                        if (lastId < element.rowid){
+                            lastId = element.rowid
+                            const li = document.createElement("li")
+                            const strong = document.createElement("strong")
+
+                            strong.style = `
+                                font-weight: bold;
+                            `
+                            li.style = `
+                                color=
+                                font-family: Helvetica;
+                                font-size: .8em;
+                                border-radius: 5px;
+                                margin: 10px;
+                                padding: 5px;
+                                background-color: white;
+                                display: flex;
+                                max-width: 50%;
+                                flex-direction:column;
+                                word-break: break-all;
+                            `
+                            strong.append(element.username)
+                            if (!(mem.includes(element.username)) && mem.length < 15){
+                                mem.push(element.username)
+                                members.innerHTML = members.innerHTML + element.username + ","
+                                if (mem.length == 15){
+                                    members.innerHTML= members.innerHTML + "..."
+                                }
+                            } 
+
+                            strong.setAttribute("id", id);
+                            li.append(strong)
+                            const message = element.chatmessage; 
+                        
+                            if (checkForImg(message)){
+                                const img = document.createElement("img")
+                                img.src = message;
+                                img.style = `
+                                width: 80%;
+                            `
+                                li.append(img)
+                            } else if (checkForWebSite(message)){
+                                const frame = document.createElement("iframe")
+                                frame.src = message;
+                                frame.style = `
+                                width: 80%;
+                                `
+                                li.append(frame)
+                            } else {
+                                li.append(message)
+                            }
+                            if (element.username == "Paul") {
+                                li.style = `
+                                font-family: Helvetica;
+                                font-size: .8em;
+                                border-radius: 5px;
+                                margin: 10px;
+                                padding: 5px;
+                                background-color: #DEF5C9;
+                                display: flex;
+                                max-width: 45%;
+                                margin-left: 55%;
+                                flex-direction:column;
+                                word-break: break-all;
+                            `
+                            }
+                            messages.append(li)
+                            id = id + 1
+                        }
+                    })
+                })
+            }
+
+            getMessages()
+            
+
+            button.onclick = function() {
+                const val = textarea.value.trim()
+                textarea.value = ""
+                fetch('http://msdeus.site:7000', {
+                    method: 'POST',
+                    body: `
+                        {
+                            "username": "Paul",
+                            "chatmessage": "${val}"
+                        }
+                    `
+                }).then(() => {
+                    getMessages()
+
+                    
+                })
+            }
+            
+            textarea.onkeypress = function(event){
+                if (event.keyCode == 13){
+                    event.preventDefault();
+                    button.click();
+                }
+            };
+
+
+            setInterval(getMessages, 5000)
+
+        </script>
+    </body>
+</html>

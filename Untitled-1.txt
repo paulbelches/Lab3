@@ -1,0 +1,90 @@
+<html>
+    <body>
+        <script>
+            const messagesContainer = document.createElement("div")
+            const messages = document.createElement("ul");
+            const sendContainer = document.createElement("div")
+
+            const textarea = document.createElement("textarea")
+            textarea.id = "sendTextArea"
+
+            const button = document.createElement("button")
+            button.id = "sendButton"
+
+            messagesContainer.style = `
+                width: 60%; 
+                height: 80%;
+                overflow-y: scroll;
+            `
+
+            button.append("Enviar")
+
+            messagesContainer.append(messages)
+
+            sendContainer.append(textarea)
+
+            sendContainer.append(button)
+
+            sendContainer.style = `
+                display: flex;
+                width: 60%; 
+                height: 10%;
+            `
+            document.body.append(textarea)
+            document.body.append(button)
+
+            document.getElementById("sendTextArea").maxLength = "140";
+
+            document.getElementById("sendTextArea").onkeypress = function(event){
+                if (event.keyCode == 13){
+                    event.preventDefault();
+                    /*document.getElementById("sendButton").click();*/
+                }
+            };
+
+            function getMessages(){
+
+                fetch('http://msdeus.site:7000', {
+                    method: 'GET'
+                }).then(response => {
+                    // console.log("After fetch", response)
+                    return response.json()
+                }).then(response => {
+                    messages.innerHTML = ""
+                    response.forEach(element => {
+                        console.log('response', response)
+                        const li = document.createElement("li")
+                        const strong = document.createElement("strong")
+                        strong.append(element.username + ": ")
+                        li.append(strong)
+                        li.append(element.chatmessage)
+
+                        messages.append(li)
+                    });
+                })
+            }
+
+            getMessages()
+            
+
+            button.onclick = function() {
+                const val = textarea.value.trim()
+                console.log('clicked...')
+                fetch('http://msdeus.site:7000', {
+                    method: 'POST',
+                    body: `
+                        {
+                            "username": "Amigo",
+                            "chatmessage": "${val}"
+                        }
+                    `
+                }).then(() => {
+                    getMessages()    
+                })
+            }
+
+            setInterval(getMessages, 5000)
+
+        </script>
+    </body>
+</html>
